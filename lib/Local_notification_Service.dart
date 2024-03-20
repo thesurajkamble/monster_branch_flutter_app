@@ -1,54 +1,48 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService {
-  static final FlutterLocalNotificationsPlugin
-      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  static Future<void> initialize() async {
+  Future<void> init() async {
+    // init for android
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final IOSInitializationSettings initializationSettingsIOS =
-        const IOSInitializationSettings();
-
-    final InitializationSettings initializationSettings =
+    // init for ios
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-
-    await _flutterLocalNotificationsPlugin.initialize(
+    await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
     );
   }
 
-  static Future<void> showNotification({
-    required String title,
-    required String body,
-    required String imageUrl,
-    required String url,
-  }) async {
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      'your channel description',
-      largeIcon: DrawableResourceAndroidBitmap(imageUrl),
-    );
-
-    const IOSNotificationDetails iOSPlatformChannelSpecifics = IOSNotificationDetails();
-
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: url,
-    );
+  void showNotificationAndroid(String title, String value) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('channel_id', 'Channel Name',
+            channelDescription: 'Channel Description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+    int notificationId = 1;
+    const NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin.show(
+        notificationId, title, value, notificationDetails,
+        payload: 'Not present');
   }
+
+  void showNotificationIos(String title, String value) async {
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails();
+    int notificationId = 1;
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(iOS: iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        notificationId, title, value, platformChannelSpecifics,
+        payload: 'Not present');
+  }
+
 }

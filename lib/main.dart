@@ -9,7 +9,8 @@ import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await LocalNotificationService.initialize();
+  LocalNotificationService().init();
+  await FlutterBranchSdk.init(useTestKey: true, enableLogging: true, disableTracking: false);
   runApp(const MyApp());
 }
 

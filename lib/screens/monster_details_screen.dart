@@ -6,7 +6,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:MonsterApp/viewmodels/common_viewmodel.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+import '../Local_notification_Service.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+final LocalNotificationService notificationService = LocalNotificationService();
 
 class MonsterDetailScreen extends StatelessWidget {
   final String monsterName;
@@ -54,7 +58,8 @@ class MonsterDetailScreen extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () async {
-                  await  _requestNotificationPermission();
+                    notificationService.showNotificationAndroid("here's yout monster", "somer randksjhdskhfhjbdhfvbdfvkhdsbvjhkdsbhdb");
+                    notificationService.showNotificationIos("here's ios notitification ", "ios noiindbhjsdbhgsdhgvsdhgvsdhbhsbdsdvsdfvbhsd");
                   },
                   icon: const Icon(Icons.notifications),
                 ),
@@ -78,28 +83,5 @@ class MonsterDetailScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-  Future<void> _requestNotificationPermission() async {
-    final settings = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    if (settings?.didNotificationLaunchApp ?? false) {
-      return;
-    }
-    final bool? result = await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    if (result ?? false) {
-      CommonViewmodel.showCustomNotification(
-          "custom notification",
-          "notidication body",
-          monsterImage,
-          "https://www.suraj.com/red");
-    } else {
-      CommonViewmodel.showToast("error showing notification");
-    }
   }
 }
