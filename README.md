@@ -1,16 +1,9 @@
-# tester
+# monster app
 
-A new Flutter project.
+note: tested on android. 
 
-## Getting Started
+https://github.com/thesurajkamble/monster_branch_flutter_app/assets/44117642/8912cd8b-9dce-4d79-a9ac-3ee2567852d8
 
-This project is a starting point for a Flutter application.
+## DashBoard link
+## https://dashboard.branch.io/liveview/events
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
