@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:MonsterApp/screens/home_screen.dart';
 import 'package:MonsterApp/screens/monster_details_screen.dart';
 import 'package:MonsterApp/screens/profile_screen.dart';
@@ -12,6 +11,7 @@ import 'analytics/branch_analytics_manager.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 
 final LocalNotificationService notificationService = LocalNotificationService();
+final BranchAnalyticsManager analyticsManager = BranchAnalyticsManager();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +52,7 @@ class _MainActivityState extends State<MainActivity> {
   void initState() {
     super.initState();
     listenDeepLinkData();
+    notificationService.requestIOSPermissions();
   }
 
   @override
@@ -135,18 +136,35 @@ class _MainActivityState extends State<MainActivity> {
   }
 
   void handleHomeButtonClicked() {
+    analyticsManager.sendCustomEvent("click: home");
     navigateToScreen(const HomeScreen());
   }
 
   void handleProfileButtonClicked() {
+    analyticsManager.sendCustomEvent("click: profile");
     navigateToScreen(const ProfileScreen());
   }
 
   void handleShopButtonClicked() {
+    analyticsManager.sendCustomEvent("click: shop");
     navigateToScreen(ShopScreen());
   }
 
   void listenDeepLinkData() {
+    analyticsManager.sendCommerceEvent(
+        eventName: "Add to cart",
+        transactionID: "12565682364",
+        currency: BranchCurrencyType.INR,
+        revenue: 200000,
+        shipping: 2000,
+        tax: 499,
+        coupon: "null",
+        affiliation: "instagram",
+        eventDescription: "tracks user monster purchase",
+        searchQuery: "cute lil  monster",
+        branchStandardEvent: BranchStandardEvent.CLICK_AD,
+        adType: BranchEventAdType.NATIVE);
+
     streamSubscriptionDeepLink = FlutterBranchSdk.initSession().listen((data) {
       debugPrint('data: $data');
       if (data.containsKey('+clicked_branch_link') &&

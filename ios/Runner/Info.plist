@@ -52,5 +52,7 @@
         </array>
         <key>FlutterDeepLinkingEnabled</key>
         <true/>
+        	<key>branch_enable_log</key>
+        	<true/>
 </dict>
 </plist>

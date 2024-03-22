@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:MonsterApp/analytics/branch_analytics_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -49,6 +50,20 @@ class MonsterDetailScreen extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    analyticsManager.sendCustomEvent("Add to cart");
+                    analyticsManager.sendCommerceEvent(
+                        eventName: "Add to cart",
+                        transactionID: "12565682364",
+                        currency: BranchCurrencyType.INR,
+                        revenue: 200000,
+                        shipping: 2000,
+                        tax: 499,
+                        coupon: "null",
+                        affiliation: "instagram",
+                        eventDescription: "tracks user monster purchase",
+                        searchQuery: "cute lil  monster",
+                        branchStandardEvent: BranchStandardEvent.ADD_TO_CART,
+                        adType: BranchEventAdType.NATIVE);
                     CommonViewmodel.showToast("$monsterName is Added to Cart!");
                   },
                   child: const Text('Add to Cart'),
@@ -61,10 +76,22 @@ class MonsterDetailScreen extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () async {
-                    // String notifDeepLink = await analyticsManager
-                    //     .generateDeepLink(monsterImage, monsterName);
-                    // print(analyticsManager.generateDeepLink(
-                    //     monsterName, monsterName));
+                    analyticsManager.sendCustomEvent(
+                        "notif clicked"
+                    );
+                    analyticsManager.sendCommerceEvent(
+                        eventName: "Add to cart",
+                        transactionID: "12565682364",
+                        currency: BranchCurrencyType.INR,
+                        revenue: 200000,
+                        shipping: 2000,
+                        tax: 499,
+                        coupon: "null",
+                        affiliation: "instagram",
+                        eventDescription: "tracks user monster purchase",
+                        searchQuery: "cute lil  monster",
+                        branchStandardEvent: BranchStandardEvent.CLICK_AD,
+                        adType: BranchEventAdType.NATIVE);
                     Map<String, dynamic> payloadData = {
                       'monsterName': monsterName,
                       'monsterImage': monsterImage,
@@ -84,10 +111,26 @@ class MonsterDetailScreen extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () async {
+                    analyticsManager.sendCustomEvent(
+                        "shared"
+                    );
+                    analyticsManager.sendCommerceEvent(
+                        eventName: "Add to cart",
+                        transactionID: "12565682364",
+                        currency: BranchCurrencyType.INR,
+                        revenue: 200000,
+                        shipping: 2000,
+                        tax: 499,
+                        coupon: "null",
+                        affiliation: "instagram",
+                        eventDescription: "tracks user monster purchase",
+                        searchQuery: "cute lil  monster",
+                        branchStandardEvent: BranchStandardEvent.SHARE,
+                        adType: BranchEventAdType.NATIVE);
                     String deepLink = await analyticsManager.generateDeepLink(
                         monsterImage, monsterName);
                     final result = await Share.shareWithResult(
-                        "check out my website $deepLink");
+                        "Monster $monsterName is shared with you!! $deepLink");
                     if (result.status == ShareResultStatus.success) {
                       CommonViewmodel.showToast(
                           "Monster $monsterName shared successfully");
