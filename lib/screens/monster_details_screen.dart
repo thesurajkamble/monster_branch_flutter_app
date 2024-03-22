@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:MonsterApp/analytics/branch_analytics_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -8,13 +11,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../Local_notification_Service.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 final LocalNotificationService notificationService = LocalNotificationService();
+final BranchAnalyticsManager analyticsManager = BranchAnalyticsManager();
 
 class MonsterDetailScreen extends StatelessWidget {
   final String monsterName;
   final String monsterImage;
+
   const MonsterDetailScreen(
       {super.key, required this.monsterName, required this.monsterImage});
 
@@ -58,15 +61,33 @@ class MonsterDetailScreen extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () async {
-                    notificationService.showNotificationAndroid("here's yout monster", "somer randksjhdskhfhjbdhfvbdfvkhdsbvjhkdsbhdb");
-                    notificationService.showNotificationIos("here's ios notitification ", "ios noiindbhjsdbhgsdhgvsdhgvsdhbhsbdsdvsdfvbhsd");
+                    // String notifDeepLink = await analyticsManager
+                    //     .generateDeepLink(monsterImage, monsterName);
+                    // print(analyticsManager.generateDeepLink(
+                    //     monsterName, monsterName));
+                    Map<String, dynamic> payloadData = {
+                      'monsterName': monsterName,
+                      'monsterImage': monsterImage,
+                    };
+                    String payload = jsonEncode(payloadData);
+
+                    notificationService.showNotificationAndroid(
+                        "Your cute lil monster $monsterName",
+                        "$monsterName is shared from monster shop list",
+                        payload);
+                    notificationService.showNotificationIos(
+                        "Your cute lil monster $monsterName",
+                        "$monsterName is shared from monster shop list",
+                        payload);
                   },
                   icon: const Icon(Icons.notifications),
                 ),
                 IconButton(
                   onPressed: () async {
+                    String deepLink = await analyticsManager.generateDeepLink(
+                        monsterImage, monsterName);
                     final result = await Share.shareWithResult(
-                        'check out my website https://example.com');
+                        "check out my website $deepLink");
                     if (result.status == ShareResultStatus.success) {
                       CommonViewmodel.showToast(
                           "Monster $monsterName shared successfully");

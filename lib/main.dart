@@ -1,4 +1,8 @@
+import 'dart:async';
+
+
 import 'package:MonsterApp/screens/home_screen.dart';
+import 'package:MonsterApp/screens/monster_details_screen.dart';
 import 'package:MonsterApp/screens/profile_screen.dart';
 import 'package:MonsterApp/screens/shop_screen.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +11,13 @@ import 'Local_notification_Service.dart';
 import 'analytics/branch_analytics_manager.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 
+final LocalNotificationService notificationService = LocalNotificationService();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  LocalNotificationService().init();
-  await FlutterBranchSdk.init(useTestKey: true, enableLogging: true, disableTracking: false);
+  await FlutterBranchSdk.init().then((value) {
+    FlutterBranchSdk.validateSDKIntegration();
+  });
   runApp(const MyApp());
 }
 
@@ -39,24 +46,23 @@ class MainActivity extends StatefulWidget {
 class _MainActivityState extends State<MainActivity> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  StreamSubscription<Map>? streamSubscriptionDeepLink;
+
   @override
   void initState() {
     super.initState();
-    // Initialize Branch SDK
-    // FlutterBranchSdk.initSession().listen((isInit) {
-    //   if (isInit) {
-    //     // Get deep link parameters
-    //     Map<dynamic, dynamic>? sessionParams =
-    //         Branch.getLatestReferringParams();
-    //     if (sessionParams != null && sessionParams.containsKey("monsterId")) {
-    //       navigateToScreen(ShopFragment(), sessionParams["monsterId"]);
-    //     }
-    //   }
-    // });
+    listenDeepLinkData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    streamSubscriptionDeepLink?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
+    LocalNotificationService().init(context);
     return Scaffold(
       key: _scaffoldKey,
       body: Builder(
@@ -138,5 +144,34 @@ class _MainActivityState extends State<MainActivity> {
 
   void handleShopButtonClicked() {
     navigateToScreen(ShopScreen());
+  }
+
+  void listenDeepLinkData() {
+    streamSubscriptionDeepLink = FlutterBranchSdk.initSession().listen((data) {
+      debugPrint('data: $data');
+      if (data.containsKey('+clicked_branch_link') &&
+          data['+clicked_branch_link'] == true) {
+        if (data.containsKey('monsterImage') &&
+            data.containsKey('monsterName')) {
+          String monsterImage = data['monsterImage'] ?? '';
+          String monsterName = data['monsterName'] ?? '';
+          print("monsterimage $monsterImage, monsterName $monsterName");
+
+          // Navigating to MonsterDetailScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MonsterDetailScreen(
+                monsterName: monsterName,
+                monsterImage: monsterImage,
+              ),
+            ),
+          );
+        }
+      }
+    }, onError: (error) {
+      PlatformException platformException = error as PlatformException;
+      debugPrint('exception: $platformException');
+    });
   }
 }

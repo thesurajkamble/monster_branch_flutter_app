@@ -1,35 +1,40 @@
-// import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
-//
-// class BranchAnalyticsManager {
-//   static Future<Uri> generateDeepLink({
-//     required String canonicalIdentifier,
-//     required String title,
-//     required String contentDescription,
-//     required String contentImageUrl,
-//     required List<String> keywords,
-//     required String channel,
-//     required String feature,
-//     required String campaign,
-//   }) async {
-//     final BranchUniversalObject buo = BranchUniversalObject(
-//       canonicalIdentifier: canonicalIdentifier,
-//       title: title,
-//       contentDescription: contentDescription,
-//       contentImageUrl: contentImageUrl,
-//       keywords: keywords,
-//     );
-//
-//     final BranchLinkProperties lp = BranchLinkProperties(
-//       channel: channel,
-//       feature: feature,
-//       campaign: campaign,
-//     );
-//
-//     final Uri deepLink = await buo.createDeepLink(lp: lp);
-//     return deepLink;
-//   }
-//
-//   static void trackEvent(String eventName) {
-//
-//   }
-// }
+import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
+import 'package:uuid/uuid.dart';
+
+class BranchAnalyticsManager {
+  BranchContentMetaData metadata = BranchContentMetaData();
+  BranchLinkProperties lp = BranchLinkProperties();
+  late BranchUniversalObject buo;
+  late BranchEvent eventStandard;
+  late BranchEvent eventCustom;
+
+  DateTime today = DateTime.now();
+
+  Future<String> generateDeepLink(String monsterImage, String monsterName) async {
+    String dateString =
+        '${today.year}-${today.month}-${today.day} ${today.hour}:${today.minute}:${today.second}';
+    metadata = BranchContentMetaData()
+      ..addCustomMetadata('monsterImage', monsterImage)
+      ..addCustomMetadata('monsterName', monsterName)
+      ..addCustomMetadata('date_created', dateString);
+    BranchUniversalObject branchUniversalObject = BranchUniversalObject(
+      canonicalIdentifier: 'flutter/branch',
+      contentMetadata: metadata,
+    );
+
+    FlutterBranchSdk.registerView(buo: branchUniversalObject);
+
+    BranchLinkProperties lp = BranchLinkProperties(feature: 'sharing');
+    lp.addControlParam('\$uri_redirect_mode', '1');
+
+    BranchResponse response = await FlutterBranchSdk.getShortUrl(
+        buo: branchUniversalObject, linkProperties: lp);
+
+    if (response.success) {
+      return response.result!;
+    } else {
+      throw Exception(
+          'Error : ${response.errorCode} - ${response.errorMessage}');
+    }
+  }
+}
